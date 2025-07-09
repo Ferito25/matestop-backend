@@ -1,8 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-app.use(cors());
 
+// Middleware para permitir CORS y parsear JSON del body
+app.use(cors());
+app.use(express.json());
+
+// Cargar el router de preguntas guardadas en questions.json
+const questionsRouter = require('./routes/questions');
+app.use('/questions', questionsRouter);
+
+// Preguntas dinámicas de 1º de primaria
 const temasPrimaria1 = {
   "Números y comparación": {
     "Leer y escribir hasta el 10": () => {
@@ -43,6 +51,7 @@ const temasPrimaria1 = {
   }
 };
 
+// Ruta para generar preguntas aleatorias
 app.get("/preguntas", (req, res) => {
   const { curso, tema, subtipo = "mixto" } = req.query;
   if (curso !== "1primaria" || !temasPrimaria1[tema]) {
@@ -65,5 +74,7 @@ app.get("/preguntas", (req, res) => {
   res.json(preguntas);
 });
 
+// Iniciar servidor
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Servidor iniciado en puerto ${port}`));
+
